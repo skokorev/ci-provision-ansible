@@ -1,0 +1,30 @@
+---
+- name: Add OpenJDK Repository
+  become: yes
+  apt_repository: repo='ppa:openjdk-r/ppa'
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install dependencies
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  with_items:
+    - 'apt-transport-https'
+    - 'ca-certificates'
+    - 'curl'
+    - 'software-properties-common'
+
+- name: Install OpenJDK 8
+  apt:
+    become: yes
+    name: openjdk-8-jdk
+    state: latest
+
+- name: Update alternatives to java 8
+  alternatives:
+    name: java
+    path: /usr/lib/jvm/java-8-openjdk-amd64/bin/java
