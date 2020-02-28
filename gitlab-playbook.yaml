@@ -1,4 +1,5 @@
 - name: Install CI infrastructure
   hosts: all
   tasks: 
-  - import_tasks: tasks/java.yaml
+  - include: tasks/java.yaml
+  - include: tasks/docker.yaml

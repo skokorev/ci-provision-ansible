@@ -1,0 +1,25 @@
+- name: Install dependencies
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  with_items:
+    - 'git'
+    - 'apt-transport-https'
+    - 'wget'
+    - 'gnupg2'
+- name: Add docker key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+- name: Add docker repo
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/debian stretch stable
+    state: present
+- name: Update apt cache
+  apt:
+    update_cache: yes
+- name: Install Docker CE
+  apt:
+    name: "docker-ce"
+    state: latest
