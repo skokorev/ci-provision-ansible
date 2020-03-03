@@ -43,7 +43,7 @@
 
 - name: Copy default settings
   copy:
-    src: /vagrant/artifactory.default
+    src: /vagrant/provision/artifactory.default
     dest: /opt/jfrog/artifactory/bin/artifactory.default
     owner: foo
     group: foo
@@ -58,3 +58,9 @@
 
 - name: Run artifactory installation script
   shell: /opt/jfrog/artifactory/bin/installService.sh
+
+- name: Make sure a service is running
+  systemd:
+    daemon_reload: yes
+    state: started
+    name: artifactory

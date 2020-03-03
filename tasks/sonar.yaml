@@ -1,0 +1,61 @@
+- name: Install PostgreSQL
+  apt: 
+    name: {{ item }} 
+    update_cache: true 
+    state: installed
+  with_items:
+    - postgresql
+    - postgresql-contrib
+
+- name: Set password for postgres user
+  user:
+    name: postgres
+    password: postgres
+
+- name: Create user sonar
+  sudo: true
+  sudo_user: postgres
+  shell: createuser sonar
+
+- name: Set password
+  sudo: true
+  sudo_user: postgres
+  shell: psql -c "ALTER USER sonar WITH ENCRYPTED password 'StrongPassword';"
+
+- name: Set owner
+  sudo: true
+  sudo_user: postgres
+  shell: psql -c "CREATE DATABASE sonar OWNER sonar;"
+
+- name: Download Sonar
+  get_url:
+    url: https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-6.4.zip
+    dest: /tmp/sonarqube-6.4.zip
+    mode: '0440'
+
+- name: Unarchive a file that is already on the remote machine
+  unarchive:
+    src: /tmp/sonarqube-6.4.zip
+    dest: /opt
+
+- name: Create a symbolic link to artifactory directory
+  file:
+    src: /opt/sonarqube-6.4
+    dest: /opt/sonarqube
+    state: link
+
+- name: Copy default settings
+  copy:
+    src: /vagrant/provision/sonar.properties
+    dest: /opt/sonarqube/conf/sonar.properties
+
+- name: Copy service settings
+  copy:
+    src: /vagrant/provision/sonar.service
+    dest: /etc/systemd/system/sonar.service
+
+- name: Make sure a service is running
+  systemd:
+    state: started
+    daemon_reload: yes
+    name: sonar
