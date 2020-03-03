@@ -1,0 +1,60 @@
+- name: Create artifactory directory
+  file:
+    path: /var/opt/jfrog/artifactory
+    state: directory
+    mode: '0755'
+
+- name: Add artifactory group
+  group:
+    name: artifactory
+    state: present
+
+- name: Add artifactory user
+  user:
+    name: artifactory
+    group: artifactory
+    shell: /bin/false
+    home: /opt/jfrog/artifactory
+
+- name: Download artifactory
+  get_url:
+    url: https://bintray.com/jfrog/artifactory/download_file?file_path=jfrog-artifactory-oss-6.12.2.zip
+    dest: /tmp/jfrog-artifactory-oss-6.12.2.zip
+    mode: '0440'
+
+- name: Unarchive a file that is already on the remote machine
+  unarchive:
+    src: /tmp/jfrog-artifactory-oss-6.12.2.zip
+    dest: /opt
+
+- name: Create artifactory directory
+  file:
+    path: /opt/jfrog
+    state: directory
+    mode: '0755'
+
+- name: Create a symbolic link to artifactory directory
+  file:
+    src: /opt/artifactory-oss-6.12.2
+    dest: /opt/jfrog/artifactory
+    owner: artifactory
+    group: artifactory
+    state: link
+
+- name: Copy default settings
+  copy:
+    src: /vagrant/artifactory.default
+    dest: /opt/jfrog/artifactory/bin/artifactory.default
+    owner: foo
+    group: foo
+    mode: '0644'
+
+- name: Change owner
+  file: 
+    dest: /opt/jfrog
+    owner: artifactory 
+    group: artifactory
+    recurse: yes
+
+- name: Run artifactory installation script
+  shell: /opt/jfrog/artifactory/bin/installService.sh
