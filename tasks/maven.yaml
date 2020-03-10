@@ -1,0 +1,4 @@
+- name: Install Maven 3
+  apt:
+    name: maven
+    state: latest

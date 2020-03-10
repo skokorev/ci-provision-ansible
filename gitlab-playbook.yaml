@@ -3,3 +3,5 @@
   tasks: 
   - include: tasks/java.yaml
   - include: tasks/docker.yaml
+  - include: tasks/maven.yaml
+  - include: tasks/gitlab.yaml
