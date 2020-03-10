@@ -5,3 +5,6 @@
   - include: tasks/docker.yaml
   - include: tasks/maven.yaml
   - include: tasks/gitlab.yaml
+  - include: tasks/artifactory.yaml
+  - include: tasks/chrome.yaml
+  - include: tasks/sonar.yaml

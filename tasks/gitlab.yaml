@@ -16,7 +16,9 @@
     dest: /tmp/script.deb.sh
 
 - name: Run preparation script
-  script: /tmp/script.deb.sh
+  shell: script.deb.sh
+  args:
+    chdir: /tmp
 
 - name: Install GitLab
   apt:
