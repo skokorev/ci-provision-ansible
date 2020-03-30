@@ -9,12 +9,14 @@
     name: artifactory
     state: present
 
-- name: Add artifactory user
-  user:
-    name: artifactory
-    group: artifactory
-    shell: /bin/false
-    home: /opt/jfrog/artifactory
+- name: stat artifactory
+  stat: path=/opt/jfrog/artifactory
+  register: artifactory_stat
+
+- name: Creates jfrog directory
+  file:
+    path: /opt/jfrog
+    state: directory 
 
 - name: Download artifactory
   get_url:
@@ -22,31 +24,33 @@
     dest: /tmp/jfrog-artifactory-oss-6.12.2.zip
     mode: '0440'
 
+- name: Install unzip
+  apt:
+    name: unzip  
+
 - name: Unarchive a file that is already on the remote machine
   unarchive:
     src: /tmp/jfrog-artifactory-oss-6.12.2.zip
     dest: /opt
+    remote_src: yes
 
-- name: Create artifactory directory
-  file:
-    path: /opt/jfrog
-    state: directory
-    mode: '0755'
+- name:
+  shell: mv /opt/artifactory-oss-6.12.2 /opt/jfrog/artifactory
+  when: artifactory_stat.stat.islnk is not defined
 
-- name: Create a symbolic link to artifactory directory
-  file:
-    src: /opt/artifactory-oss-6.12.2
-    dest: /opt/jfrog/artifactory
-    owner: artifactory
+- name: Add artifactory user
+  user:
+    name: artifactory
     group: artifactory
-    state: link
+    shell: /bin/false
+    home: /opt/jfrog/artifactory
 
 - name: Copy default settings
   copy:
     src: /vagrant/provision/artifactory.default
     dest: /opt/jfrog/artifactory/bin/artifactory.default
-    owner: foo
-    group: foo
+    owner: artifactory
+    group: artifactory
     mode: '0644'
 
 - name: Change owner
@@ -59,8 +63,13 @@
 - name: Run artifactory installation script
   shell: /opt/jfrog/artifactory/bin/installService.sh
 
-- name: Make sure a service is running
+- name: restart service
   systemd:
-    daemon_reload: yes
     state: started
     name: artifactory
+    no_block: yes
+
+- name: Wait for port 8081 to become open on the host
+  wait_for:
+    port: 8081
+    delay: 30

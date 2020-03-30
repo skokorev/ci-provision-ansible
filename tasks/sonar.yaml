@@ -1,11 +1,11 @@
 - name: Install PostgreSQL
   apt: 
-    name: {{ item }} 
+    name: "{{ item }}" 
     update_cache: true 
     state: installed
   with_items:
-    - postgresql
-    - postgresql-contrib
+    - 'postgresql'
+    - 'postgresql-contrib'
 
 - name: Set password for postgres user
   user:

@@ -15,10 +15,13 @@
     url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh
     dest: /tmp/script.deb.sh
 
-- name: Run preparation script
-  shell: script.deb.sh
+- name: Changing perm of preparation script, adding "+x"
+  file: dest=/tmp/script.deb.sh mode=a+x
+
+- name: preparation script
+  raw: /tmp/script.deb.sh
   args:
-    chdir: /tmp
+    executable: /bin/bash
 
 - name: Install GitLab
   apt:
@@ -27,7 +30,7 @@
 
 - name: Change default URL
   replace:
-    path: /etc/gitlab/gitlab.rb
+    dest: /etc/gitlab/gitlab.rb
     regexp: 'external_url\shttp:\/\/gitlab\.example\.com'
     replace: 'external_url http://dev.gitlab'
 

@@ -1,6 +1,6 @@
 - name: Install CI infrastructure
   hosts: all
-  tasks: 
+  tasks:   
   - include: tasks/java.yaml
   - include: tasks/docker.yaml
   - include: tasks/maven.yaml

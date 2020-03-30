@@ -1,0 +1,2 @@
+- name: Install Python
+  raw: sudo apt-get install python
