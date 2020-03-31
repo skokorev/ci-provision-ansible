@@ -1,4 +1,8 @@
 - name: Install CI infrastructure
+  remote_user: admin
+  become: yes 
+  become_user: root
+  become_method: sudo
   hosts: all
   tasks:   
   - include: tasks/java.yaml

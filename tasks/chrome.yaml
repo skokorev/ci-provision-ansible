@@ -14,5 +14,5 @@
 
 - name: Install Chrome
   apt:
-    name: openjdk-8-jdk
-    state: google-chrome-stable
+    name: google-chrome-stable
+    state: present

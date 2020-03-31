@@ -1,31 +1,35 @@
 - name: Install PostgreSQL
-  apt: 
-    name: "{{ item }}" 
-    update_cache: true 
-    state: installed
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
   with_items:
     - 'postgresql'
     - 'postgresql-contrib'
+    - 'python-psycopg2'
 
 - name: Set password for postgres user
   user:
     name: postgres
-    password: postgres
+    password: $6$StrongRandomSalt$rsVz2fwG9ne6zE6.esJlKtTR0PdFsE987iZXJZLGNuKgsXeqKGy9ZrZPrFcWOuZx/3lmWghKpYAbA.nJSSxvV1
 
 - name: Create user sonar
-  sudo: true
-  sudo_user: postgres
-  shell: createuser sonar
+  postgresql_user:
+    name: sonar
+    password: StrongPassword
+  become: yes
+  become_user: postgres
+  vars:
+    ansible_ssh_pipelining: true
 
-- name: Set password
-  sudo: true
-  sudo_user: postgres
-  shell: psql -c "ALTER USER sonar WITH ENCRYPTED password 'StrongPassword';"
-
-- name: Set owner
-  sudo: true
-  sudo_user: postgres
-  shell: psql -c "CREATE DATABASE sonar OWNER sonar;"
+- name: Create database
+  postgresql_db:
+    name: sonar
+    owner: sonar
+  become: yes
+  become_user: postgres
+  vars:
+    ansible_ssh_pipelining: true    
 
 - name: Download Sonar
   get_url:
@@ -37,6 +41,7 @@
   unarchive:
     src: /tmp/sonarqube-6.4.zip
     dest: /opt
+    remote_src: yes
 
 - name: Create a symbolic link to artifactory directory
   file:
@@ -59,3 +64,9 @@
     state: started
     daemon_reload: yes
     name: sonar
+    no_block: yes
+
+- name: Wait for port 9000 to become open on the host
+  wait_for:
+    port: 9000
+    delay: 30    
