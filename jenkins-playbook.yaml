@@ -1,0 +1,18 @@
+- name: Install CI infrastructure
+  remote_user: admin
+  become: yes 
+  become_user: root
+  become_method: sudo
+  hosts: all
+  vars:
+    tomcat_version: 9.0.27
+  tasks:   
+  - include: tasks/java.yaml
+  - include: tasks/docker.yaml
+  - include: tasks/maven.yaml
+  - include: tasks/tomcat.yaml
+  - include: tasks/jenkins.yaml
+  - include: tasks/artifactory.yaml
+  - include: tasks/chrome.yaml
+  - include: tasks/sonar.yaml
+  - include: tasks/bluegreendata.yaml

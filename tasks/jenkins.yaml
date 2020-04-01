@@ -1,0 +1,27 @@
+- name: Stop tomcat
+  systemd:
+    state: stopped
+    name: tomcat
+
+- name: Download jenkins
+  get_url:
+    url: http://mirrors.jenkins.io/war-stable/latest/jenkins.war
+    dest: /opt/tomcat/webapps/jenkins.war
+    mode: '0440'
+
+- name: Change owner
+  file: 
+    dest: /opt/tomcat/webapps/jenkins.war
+    owner: tomcat 
+    group: tomcat
+
+- name: Start tomcat
+  systemd:
+    state: started
+    name: tomcat
+    no_block: yes
+
+- name: Wait for port 8080 to become open on the host
+  wait_for:
+    port: 8080
+    delay: 30    

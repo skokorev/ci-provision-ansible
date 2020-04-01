@@ -26,7 +26,8 @@
 
 - name: Install unzip
   apt:
-    name: unzip  
+    name: unzip
+    state: present
 
 - name: Unarchive a file that is already on the remote machine
   unarchive:

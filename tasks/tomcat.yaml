@@ -1,0 +1,60 @@
+- name: Create tomcat directory
+  file:
+    path: /opt/tomcat
+    state: directory
+    mode: '0755'
+
+- name: Add tomcat group
+  group:
+    name: tomcat
+    state: present
+
+- name: Add tomcat user
+  user:
+    name: tomcat
+    group: tomcat
+    shell: /bin/false
+    home: /opt/tomcat
+
+- name: Download tomcat
+  get_url:
+    url: "https://archive.apache.org/dist/tomcat/tomcat-9/v{{ tomcat_version }}/bin/apache-tomcat-{{ tomcat_version }}.tar.gz"
+    dest: /tmp/tomcat.tar.gz
+    mode: '0440'
+
+- name: Unarchive a file that is already on the remote machine
+  unarchive:
+    src: /tmp/tomcat.tar.gz
+    dest: /opt/tomcat
+    extra_opts: ['--strip-components=1']
+    remote_src: yes
+
+- name: Change owner
+  file: 
+    dest: /opt/tomcat
+    owner: tomcat 
+    group: tomcat
+    recurse: yes
+
+- name: Change mode
+  file: 
+    dest: /opt/tomcat/conf
+    mode: g+rwx
+    recurse: yes 
+
+- name: Copy service settings
+  copy:
+    src: /vagrant/provision/tomcat.service
+    dest: /etc/systemd/system/tomcat.service
+
+- name: Make sure a service is running
+  systemd:
+    state: started
+    daemon_reload: yes
+    name: tomcat
+    no_block: yes
+
+- name: Wait for port 8080 to become open on the host
+  wait_for:
+    port: 8080
+    delay: 30    

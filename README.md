@@ -43,6 +43,12 @@ sudo apt-get install python
 exit
 ```
 8. Запустить provisioning
+
+Для GitLab
 ```
 ansible-playbook --private-key /home/vagrant/.ssh/id_rsa -i /vagrant/inventory.yaml /vagrant/gitlab-playbook.yaml
+```
+Для Jenkins
+```
+ansible-playbook --private-key /home/vagrant/.ssh/id_rsa -i /vagrant/inventory.yaml /vagrant/jenkins-playbook.yaml
 ```

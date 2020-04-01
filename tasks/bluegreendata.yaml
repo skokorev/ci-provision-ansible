@@ -1,0 +1,12 @@
+- name: Create nginx directory
+  file:
+    path: /home/admin/nginx
+    state: directory
+    owner: admin
+    mode: '0755'
+
+- name: Copy service settings
+  copy:
+    src: /vagrant/nginx
+    dest: /home/admin
+    owner: admin
