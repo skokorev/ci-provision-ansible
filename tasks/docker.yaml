@@ -33,3 +33,23 @@
     path: /var/run/docker.sock
     state: touch
     mode: u=rw,g=rw,o=rw
+
+- name: Install Python-PIP
+  apt:
+    name: "python-pip"
+    state: latest
+
+- name: Install docker-py
+  raw: "pip install {{ item }}"
+  args:
+    executable: /bin/bash
+  with_items:
+    - 'docker-py'
+
+- name: Create a network
+  docker_network:
+    name: dockernet
+    driver: bridge
+    ipam_config:
+    - subnet: 192.168.0.0/24
+      gateway: 192.168.0.1

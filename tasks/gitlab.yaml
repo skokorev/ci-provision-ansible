@@ -34,5 +34,28 @@
     regexp: 'external_url\shttp:\/\/gitlab\.example\.com'
     replace: 'external_url http://dev.gitlab'
 
+- name: Insert a line at the end of a file.
+  lineinfile:
+    path: /etc/hosts
+    line: '127.0.0.1 dev.gitlab'
+
 - name: Reconfigure GitLab (first run).
-  command: gitlab-ctl reconfigure  
+  command: gitlab-ctl reconfigure
+
+- name: Download GitLab Runner preparation script
+  get_url:
+    url: https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh
+    dest: /tmp/script-runner.deb.sh
+
+- name: Changing perm of runner preparation script, adding "+x"
+  file: dest=/tmp/script-runner.deb.sh mode=a+x
+
+- name: preparation script
+  raw: /tmp/script-runner.deb.sh
+  args:
+    executable: /bin/bash
+
+- name: Install GitLab Runner
+  apt:
+    name: gitlab-runner
+    state: latest
